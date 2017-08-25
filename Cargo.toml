@@ -6,7 +6,7 @@ authors = ["Hong Minhee <hong.minhee@gmail.com>"]
 homepage = "https://github.com/dahlia/gitter-slack"
 repository = "https://github.com/dahlia/gitter-slack"
 license = "AGPL-3.0"
-lciense-file = "LICENSE"
+license-file = "LICENSE"
 readme = "README.md"
 keywords = ["gitter", "slack"]
 
