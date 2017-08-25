@@ -234,7 +234,7 @@ SLACK_WEBHOOK_URL",
             let (username, icon_url) = match message.user {
                 Some(u) => {
                     let name = format!(
-                        "\u{01f4f6} \u{2014} {} @{}",
+                        "\u{01f4f6} {} @{}",
                         u.display_name,
                         u.username,
                     );
