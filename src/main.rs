@@ -213,7 +213,13 @@ SLACK_WEBHOOK_URL",
             exit(1)
         }
     };
-    let room = rooms.iter().find(|r| r.name == room_name).unwrap();
+    let room = match rooms.iter().find(|r| r.name == room_name) {
+        Some(v) => v,
+        _ => {
+            eprintln!("Failed to find a room named {}.", room_name);
+            exit(1)
+        },
+    };
     println!("Room ID: {}", room.id);
 
     // Stream
