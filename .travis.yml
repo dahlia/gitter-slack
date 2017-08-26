@@ -1,0 +1,41 @@
+language: rust
+rust:
+- stable
+os:
+- osx
+- linux
+addons:
+  apt:
+    packages: [upx-ucl]
+before_install:
+- |
+  if [[ "$TRAVIS_OS_NAME" = "osx" ]]; then
+    brew update;
+    brew install upx;
+  fi
+after_script:
+- '[[ "$TRAVIS_TAG" != "" ]] || grep "\"${TRAVIS_TAG//./\.}\"" Cargo.toml'
+before_deploy:
+- |
+  if [[ "$TRAVIS_TAG" != "" ]]; then
+    cargo build --release;
+    if [[ "$TRAVIS_OS_NAME" = "linux" ]]; then
+      upx-ucl -9 target/release/gitter-slack
+    elif [[ "$TRAVIS_OS_NAME" = "osx" ]]; then
+      upx     -9 target/release/gitter-slack
+    fi;
+    mv target/release/gitter-slack \
+       "target/release/gitter-slack-$(uname -s | tr '[A-Z]' '[a-z]')-$(uname -m)"
+  fi
+deploy:
+- provider: releases
+  api_key: "$GITHUB_ACCESS_TOKEN"
+  file_glob: true
+  file: target/release/gitter-slack-*
+  skip_cleanup: true
+  on: { tags: true }
+after_deploy:
+- |
+  if [[ "$TRAVIS_TAG" != "" && "$TRAVIS_OS_NAME" = "linux" ]]; then
+    cargo publish --token "$CARGO_TOKEN"
+  fi
