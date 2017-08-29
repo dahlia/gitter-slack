@@ -1,6 +1,6 @@
 [package]
 name = "gitter-slack"
-version = "0.1.0"
+version = "0.1.1"
 description = "One-way relay from Gitter to Slack"
 authors = ["Hong Minhee <hong.minhee@gmail.com>"]
 homepage = "https://github.com/dahlia/gitter-slack"

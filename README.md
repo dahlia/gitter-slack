@@ -35,6 +35,11 @@ Distributed under [AGPLv3][3] or later.
 Changelog
 ---------
 
+### Version 0.1.1
+
+To be released.
+
+
 ### Version 0.1.0
 
 Initial release.  Released on August 26, 2017.
