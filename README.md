@@ -37,7 +37,7 @@ Changelog
 
 ### Version 0.1.1
 
-To be released.
+Released on August 30, 2017.
 
 - Messages became to be trimed.
 
