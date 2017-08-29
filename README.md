@@ -30,3 +30,11 @@ Distributed under [AGPLv3][3] or later.
 [1]: https://developer.gitter.im/apps
 [2]: https://spoqa.slack.com/apps/A0F7XDUAZ
 [3]: https://www.gnu.org/licenses/agpl.html
+
+
+Changelog
+---------
+
+### Version 0.1.0
+
+Initial release.  Released on August 26, 2017.
