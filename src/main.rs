@@ -8,6 +8,7 @@ extern crate serde_json;
 extern crate serde_derive;
 extern crate tokio_core;
 
+use std::convert::From;
 use std::env::args;
 use std::process::exit;
 
@@ -19,7 +20,7 @@ use hyper::client::{Client, Connect, Request};
 use hyper::header::{Authorization, Bearer, ContentType};
 use tokio_core::reactor::Core;
 
-#[derive(Deserialize, Debug)]
+#[derive(Clone, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct GitterUser {
     id: String,
@@ -41,7 +42,7 @@ struct GitterRoom {
     url: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Clone, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct GitterMessage {
     id: String,
@@ -174,6 +175,33 @@ fn post_message<C: Connect>(
     Box::new(f)
 }
 
+impl From<GitterMessage> for SlackMessage {
+    fn from(message: GitterMessage) -> Self {
+        let (username, icon_url) = match message.user {
+            Some(u) => {
+                let name = format!(
+                    "\u{01f4f6} {} @{}",
+                    u.display_name,
+                    u.username,
+                );
+                (Some(name), Some(u.avatar_url))
+            },
+            None => (None, None),
+        };
+        let message_text = message.text;
+        let text = match message.url {
+            Some(url) => format!("{} <{}|\u{2834}>", message_text, url),
+            None => message_text,
+        };
+        SlackMessage {
+            text: text,
+            username: username,
+            icon_url: icon_url,
+            mrkdwn: true,
+        }
+    }
+}
+
 fn main() -> () {
     let (access_token, room_name, slack_webhook_url) = {
         let mut argv = args();
@@ -231,27 +259,19 @@ SLACK_WEBHOOK_URL",
         );
         let post_stream = message_stream.and_then(|message| {
             println!("Message {}: {}", message.id, message.text);
-            let (username, icon_url) = match message.user {
-                Some(u) => {
-                    let name = format!(
-                        "\u{01f4f6} {} @{}",
-                        u.display_name,
-                        u.username,
+            let mut msg = message.clone();
+            let slack_msg = SlackMessage::from(match message.url {
+                Some(_) => msg,
+                None => {
+                    msg.url = Some(
+                        format!(
+                            "https://gitter.im/{}?at={}",
+                            room.url, message.id
+                        )
                     );
-                    (Some(name), Some(u.avatar_url))
+                    msg
                 },
-                None => (None, None),
-            };
-            let url = message.url.unwrap_or(
-                format!("https://gitter.im/{}?at={}", room.url, message.id)
-            );
-            let text = format!("{} <{}|\u{2834}>", message.text, url);
-            let slack_msg = SlackMessage {
-                text: text,
-                username: username,
-                icon_url: icon_url,
-                mrkdwn: true,
-            };
+            });
             post_message(
                 &client,
                 &slack_webhook_url,
