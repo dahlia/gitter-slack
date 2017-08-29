@@ -188,10 +188,10 @@ impl From<GitterMessage> for SlackMessage {
             },
             None => (None, None),
         };
-        let message_text = message.text;
+        let message_text = message.text.trim();
         let text = match message.url {
             Some(url) => format!("{} <{}|\u{2834}>", message_text, url),
-            None => message_text,
+            None => String::from(message_text),
         };
         SlackMessage {
             text: text,

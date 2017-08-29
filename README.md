@@ -39,6 +39,8 @@ Changelog
 
 To be released.
 
+- Messages became to be trimed.
+
 
 ### Version 0.1.0
 
